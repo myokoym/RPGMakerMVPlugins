@@ -44,16 +44,25 @@
     PictureBoxCommand.create = function(args) {
       console.log(args);
       var boxId = args[0]; //1-5
-      var basePictureId = (boxId - 1) * 20 + 1;
-      var basePictureName = args[1];
-      var x = args[2] || 400;
-      var y = args[3] || 0;
-      var scale = args[4] || 100;
-      PictureBoxManager.createBox(boxId, basePictureId, basePictureName, x, y, scale);
+      var pictureIdBase = (boxId - 1) * 20 + 1;
+      var x = args[1] || 400;
+      var y = args[2] || 0;
+      var scale = args[3] || 100;
+      PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
+    };
+    PictureBoxCommand.putParts = function(args) {
+      console.log(args);
+      var boxId = args[0]; //1-5
+      var zOrder = args[1]; //1-20
+      var pictureName = args[2];
+      PictureBoxManager.putParts(boxId, zOrder, pictureName);
+    };
+    PictureBoxCommand.show = function(args) {
+      console.log(args);
+      var boxId = args[0];
       PictureBoxManager.showBox(boxId);
     };
     PictureBoxCommand.erase = function(args) {
-      console.log(args);
       var boxId = args[0];
       PictureBoxManager.eraseBox(boxId);
     };
@@ -73,38 +82,71 @@
       enumerable: true,
       configurable: true
     });
-    PictureBoxManager.createBox = function(boxId, basePictureId, basePictureName, x, y, scale) {
+    PictureBoxManager.createBox = function(boxId, pictureIdBase, x, y, scale) {
       this.boxes[boxId] = {
+        pictureIdBase: pictureIdBase,
         x: x,
         y: y,
         scale: scale,
-        basePicture: {
-          id: basePictureId,
-          name: basePictureName,
-        },
-        partPictures: []
+        hide: true,
+        parts: []
       };
       console.log(PictureBoxManager.boxes);
     };
+    PictureBoxManager.putParts = function(boxId, zOrder, name) {
+      var box = this.boxes[boxId];
+      box.parts[zOrder] = {
+        zOrder: zOrder,
+        name: name
+      };
+      var opacity = 255;
+      if (box.hide) {
+        opacity = 0;
+      }
+      $gameScreen.showPicture(box.pictureIdBase + zOrder,
+                              name,
+                              0,
+                              box.x, box.y,
+                              box.scale, box.scale,
+                              opacity,
+                              0);
+    };
     PictureBoxManager.eraseBox = function(boxId) {
       // TODO: destroy parts
-      $gameScreen.erasePicture(this.boxes[boxId].basePicture.id);
+      var box = this.boxes[boxId];
+      box.parts.forEach(function(p) {
+        console.log(p);
+        if (!p) {
+          return;
+        }
+        $gameScreen.erasePicture(box.pictureIdBase + p.zOrder);
+      });
     };
     PictureBoxManager.eraseBoxAll = function() {
       for (var boxId of Object.keys(this.boxes)) {
         this.eraseBox(boxId);
       }
     };
-    PictureBoxManager.showBox = function(id) {
-      var box = this.boxes[id];
-      console.log(box);
-      $gameScreen.showPicture(box.basePicture.id,
-                              box.basePicture.name,
-                              0,
-                              box.x, box.y,
-                              box.scale, box.scale,
-                              255,
-                              0);
+    PictureBoxManager.showBox = function(boxId) {
+      this.boxes[boxId].hide = false;
+      $gameScreen._pictures.forEach(function(picture) {
+        if (picture) {
+          picture._opacity = 255;
+        }
+      });
+      //var box = this.boxes[boxId];
+      //console.log(box);
+      //box.hide = false;
+      //box.parts.forEach(function(p, index) {
+      //  if (!p) {
+      //    return;
+      //  }
+      //  console.log(box.pictureIdBase + index);
+      //  $gameScreen.movePicture(box.pictureIdBase + index, 0,
+      //                          box.x, box.y,
+      //                          box.scale, box.scale,
+      //                          255, 0, 0);
+      //});
     };
     PictureBoxManager._boxes = {};
     return PictureBoxManager;
@@ -121,6 +163,12 @@
     switch (command) {
       case 'PictureBoxCreate':
         PictureBoxCommand.create(args);
+        break;
+      case 'PictureBoxPutParts':
+        PictureBoxCommand.putParts(args);
+        break;
+      case 'PictureBoxShow':
+        PictureBoxCommand.show(args);
         break;
       case 'PictureBoxErase':
         PictureBoxCommand.erase(args);
