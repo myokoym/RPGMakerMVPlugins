@@ -38,6 +38,31 @@
 (function() {
   'use strict';
 
+  var PictureBoxCommand = (function() {
+    function PictureBoxCommand() {
+    }
+    PictureBoxCommand.create = function(args) {
+      console.log(args);
+      var boxId = args[0]; //1-5
+      var basePictureId = (boxId - 1) * 20 + 1;
+      var basePictureName = args[1];
+      var x = args[2] || 400;
+      var y = args[3] || 0;
+      var scale = args[4] || 100;
+      PictureBoxManager.createBox(boxId, basePictureId, basePictureName, x, y, scale);
+      PictureBoxManager.showBox(boxId);
+    };
+    PictureBoxCommand.erase = function(args) {
+      console.log(args);
+      var boxId = args[0];
+      PictureBoxManager.eraseBox(boxId);
+    };
+    PictureBoxCommand.eraseAll = function(args) {
+      PictureBoxManager.eraseBoxAll();
+    };
+    return PictureBoxCommand;
+  }());
+
   var PictureBoxManager = (function() {
     function PictureBoxManager() {
     }
@@ -48,15 +73,8 @@
       enumerable: true,
       configurable: true
     });
-    PictureBoxManager.createBox = function(args) {
-      console.log(args);
-      var boxId = args[0]; //1-5
-      var basePictureName = args[1];
-      var x = args[2] || 400;
-      var y = args[3] || 0;
-      var scale = args[4] || 100;
-      var basePictureId = (boxId - 1) * 20 + 1;
-      PictureBoxManager.boxes[boxId] = {
+    PictureBoxManager.createBox = function(boxId, basePictureId, basePictureName, x, y, scale) {
+      this.boxes[boxId] = {
         x: x,
         y: y,
         scale: scale,
@@ -67,13 +85,15 @@
         partPictures: []
       };
       console.log(PictureBoxManager.boxes);
-      PictureBoxManager.showBox(boxId);
     };
-    PictureBoxManager.eraseBox = function(args) {
-      console.log(args);
-      var boxId = args[0];
+    PictureBoxManager.eraseBox = function(boxId) {
       // TODO: destroy parts
-      $gameScreen.erasePicture(boxId);
+      $gameScreen.erasePicture(this.boxes[boxId].basePicture.id);
+    };
+    PictureBoxManager.eraseBoxAll = function() {
+      for (var boxId of Object.keys(this.boxes)) {
+        this.eraseBox(boxId);
+      }
     };
     PictureBoxManager.showBox = function(id) {
       var box = this.boxes[id];
@@ -85,9 +105,6 @@
                               box.scale, box.scale,
                               255,
                               0);
-    };
-    PictureBoxManager.eraseBox = function(id) {
-      $gameScreen.erasePicture(this.boxes[id].basePicture.id);
     };
     PictureBoxManager._boxes = {};
     return PictureBoxManager;
@@ -103,10 +120,13 @@
     console.log(command);
     switch (command) {
       case 'PictureBoxCreate':
-        PictureBoxManager.createBox(args);
+        PictureBoxCommand.create(args);
         break;
       case 'PictureBoxErase':
-        PictureBoxManager.eraseBox(args);
+        PictureBoxCommand.erase(args);
+        break;
+      case 'PictureBoxEraseAll':
+        PictureBoxCommand.eraseAll(args);
         break;
     }
   };
