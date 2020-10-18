@@ -29,7 +29,30 @@
  * 複数の画像をまとめて扱えるプラグインです。画像を合成せずに保持するのが特徴で、
  * 差分を重ねての表示、部分的な差し替え、一括移動、一括消去などが主な機能です。
  *
- * プラグインコマンド一覧
+ * 基本的な使用例
+ *   プラグインコマンドに以下よって操作します。
+ *
+ *   PictureBox_createBox 1 400 100 80
+ *   PictureBox_addPicture 1 1 体1
+ *   PictureBox_addPicture 1 2 表情1
+ *   PictureBox_addPicture 1 3 服1
+ *   PictureBox_showBox 1
+ *   ...
+ *   PictureBox_addPicture 1 2 表情2
+ *   ...
+ *   PictureBox_destroyBox
+ *
+ * プラグインコマンド一覧（詳細は後述）
+ *   Box生成コマンド:     PictureBox_createBox <boxId (1-5)> [x] [y] [scale]
+ *   Picture追加コマンド: PictureBox_addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *   Box表示コマンド:     PictureBox_showBox <boxId>
+ *   Box移動コマンド:     PictureBox_moveBox <boxId> <x> <y> [scale] [duration]
+ *   Picture削除コマンド: PictureBox_removePicture <boxId> <zOrder>
+ *   Box非表示コマンド:   PictureBox_hideBox <boxId>
+ *   Box破棄コマンド:     PictureBox_destroyBox <boxId>
+ *   全Box破棄コマンド:   PictureBox_destroyBoxAll
+ *
+ * プラグインコマンド詳細
  *   引数について: <>は必須、[]は任意、()は有効な値の範囲
  *
  *   Box生成コマンド
@@ -42,7 +65,8 @@
  *   Picture追加コマンド
  *     PictureBox_addPicture <boxId> <zOrder (1-20)> <pictureName>
  *     例: PictureBox_addPicture 1 1 body1
- *     説明: 追加された画像はzOrderが小さい画像から順に重ねて表示されます。
+ *     説明: pictureNameはimg/picturesフォルダ内のファイル名（拡張子除く）を指定します。
+ *           追加された画像はzOrderが小さい画像から順に重ねて表示されます。
  *           手前に表示したい画像はzOrderを大きくしてください。
  *           追加された画像はPictureBox_showBoxコマンドを呼ぶまでは非表示です。
  *
