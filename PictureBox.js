@@ -158,14 +158,14 @@
         y: y,
         scale: scale,
         hide: true,
-        parts: []
+        pictures: []
       };
       console.log(PictureBoxManager.boxes);
     };
     PictureBoxManager.addPicture = function(boxId, zOrder, name) {
       var box = this.boxes[boxId];
       zOrder = Number(zOrder);
-      box.parts[zOrder] = {
+      box.pictures[zOrder] = {
         zOrder: zOrder,
         name: name
       };
@@ -188,11 +188,11 @@
     PictureBoxManager.showBox = function(boxId) {
       var box = this.boxes[boxId];
       box.hide = false;
-      for (var part of box.parts) {
-        if (!part) {
+      for (var picture of box.pictures) {
+        if (!picture) {
           continue;
         }
-        var pictureId = box.pictureIdBase + part.zOrder;
+        var pictureId = box.pictureIdBase + picture.zOrder;
         $gameScreen.picture(pictureId)._opacity = 255;
       }
     };
@@ -207,12 +207,12 @@
       if (!duration) {
         duration = 1;
       }
-      setTimeout(function() { // PutPartsとmoveを続けて呼ぶと一部画像が消えることがあるバグの暫定対策
-        for (var part of box.parts) {
-          if (!part) {
+      setTimeout(function() { // addPictureとmoveを続けて呼ぶと一部画像が消えることがあるバグの暫定対策
+        for (var picture of box.pictures) {
+          if (!picture) {
             continue;
           }
-          var pictureId = box.pictureIdBase + part.zOrder;
+          var pictureId = box.pictureIdBase + picture.zOrder;
           console.log(pictureId);
           $gameScreen.movePicture(pictureId,
                                   0,
@@ -228,27 +228,27 @@
       var box = this.boxes[boxId];
       zOrder = Number(zOrder);
       $gameScreen.erasePicture(box.pictureIdBase + zOrder);
-      delete box.parts[zOrder];
+      delete box.pictures[zOrder];
     };
     PictureBoxManager.hideBox = function(boxId) {
       var box = this.boxes[boxId];
       box.hide = true;
-      for (var part of box.parts) {
-        if (!part) {
+      for (var picture of box.pictures) {
+        if (!picture) {
           continue;
         }
-        var pictureId = box.pictureIdBase + part.zOrder;
+        var pictureId = box.pictureIdBase + picture.zOrder;
         $gameScreen.picture(pictureId)._opacity = 0;
       }
     };
     PictureBoxManager.destroyBox = function(boxId) {
       var box = this.boxes[boxId];
-      box.parts.forEach(function(p) {
-        console.log(p);
-        if (!p) {
+      box.pictures.forEach(function(picture) {
+        console.log(picture);
+        if (!picture) {
           return;
         }
-        $gameScreen.erasePicture(box.pictureIdBase + p.zOrder);
+        $gameScreen.erasePicture(box.pictureIdBase + picture.zOrder);
       });
       delete this.boxes[boxId];
     };
