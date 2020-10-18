@@ -62,6 +62,15 @@
       var boxId = args[0];
       PictureBoxManager.showBox(boxId);
     };
+    PictureBoxCommand.move = function(args) {
+      console.log(args);
+      var boxId = args[0];
+      var x = args[1];
+      var y = args[2];
+      var scale = args[3];
+      var duration = args[4];
+      PictureBoxManager.moveBox(boxId, x, y, scale, duration);
+    };
     PictureBoxCommand.erase = function(args) {
       var boxId = args[0];
       PictureBoxManager.eraseBox(boxId);
@@ -143,6 +152,34 @@
         $gameScreen.picture(pictureId)._opacity = 255;
       }
     };
+    PictureBoxManager.moveBox = function(boxId, x, y, scale, duration) {
+      var box = this.boxes[boxId];
+      box.x = x;
+      box.y = y;
+      if (scale) {
+        console.log(scale);
+        box.scale = scale;
+      }
+      if (!duration) {
+        duration = 1;
+      }
+      setTimeout(function() { // PutPartsとmoveを続けて呼ぶと一部画像が消えることがあるバグの暫定対策
+        for (var part of box.parts) {
+          if (!part) {
+            continue;
+          }
+          var pictureId = box.pictureIdBase + part.zOrder;
+          console.log(pictureId);
+          $gameScreen.movePicture(pictureId,
+                                  0,
+                                  box.x, box.y,
+                                  box.scale, box.scale,
+                                  255,
+                                  0,
+                                  duration);
+        }
+      });
+    };
     PictureBoxManager._boxes = {};
     return PictureBoxManager;
   }());
@@ -164,6 +201,9 @@
         break;
       case 'PictureBoxShow':
         PictureBoxCommand.show(args);
+        break;
+      case 'PictureBoxMove':
+        PictureBoxCommand.move(args);
         break;
       case 'PictureBoxErase':
         PictureBoxCommand.erase(args);
