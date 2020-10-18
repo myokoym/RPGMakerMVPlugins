@@ -2,6 +2,10 @@
 
 RPGツクールMV用プラグイン集
 
+## [_skeleton.js](https://github.com/myokoym/RPGMakerMVPlugins/blob/main/_skeleton.js)
+
+新規プラグイン作成時に使用するテンプレートです。
+
 ## [PictureBox.js](https://github.com/myokoym/RPGMakerMVPlugins/blob/main/PictureBox.js)
 
 複数の画像をまとめて扱えるプラグインです。
