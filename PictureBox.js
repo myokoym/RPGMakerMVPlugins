@@ -95,6 +95,7 @@
     };
     PictureBoxManager.putParts = function(boxId, zOrder, name) {
       var box = this.boxes[boxId];
+      zOrder = Number(zOrder);
       box.parts[zOrder] = {
         zOrder: zOrder,
         name: name
@@ -103,6 +104,10 @@
       if (box.hide) {
         opacity = 0;
       }
+      console.log(box.pictureIdBase);
+      console.log(zOrder);
+      console.log("pictureId: ");
+      console.log(box.pictureIdBase + zOrder);
       $gameScreen.showPicture(box.pictureIdBase + zOrder,
                               name,
                               0,
@@ -128,25 +133,15 @@
       }
     };
     PictureBoxManager.showBox = function(boxId) {
-      this.boxes[boxId].hide = false;
-      $gameScreen._pictures.forEach(function(picture) {
-        if (picture) {
-          picture._opacity = 255;
+      var box = this.boxes[boxId];
+      box.hide = false;
+      for (var part of box.parts) {
+        if (!part) {
+          continue;
         }
-      });
-      //var box = this.boxes[boxId];
-      //console.log(box);
-      //box.hide = false;
-      //box.parts.forEach(function(p, index) {
-      //  if (!p) {
-      //    return;
-      //  }
-      //  console.log(box.pictureIdBase + index);
-      //  $gameScreen.movePicture(box.pictureIdBase + index, 0,
-      //                          box.x, box.y,
-      //                          box.scale, box.scale,
-      //                          255, 0, 0);
-      //});
+        var pictureId = box.pictureIdBase + part.zOrder;
+        $gameScreen.picture(pictureId)._opacity = 255;
+      }
     };
     PictureBoxManager._boxes = {};
     return PictureBoxManager;
