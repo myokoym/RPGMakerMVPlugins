@@ -78,6 +78,9 @@
     PictureBoxCommand.eraseAll = function(args) {
       PictureBoxManager.eraseBoxAll();
     };
+    PictureBoxCommand.destroy = function(args) {
+      PictureBoxManager.destroy();
+    };
     return PictureBoxCommand;
   }());
 
@@ -140,6 +143,10 @@
       for (var boxId of Object.keys(this.boxes)) {
         this.eraseBox(boxId);
       }
+    };
+    PictureBoxManager.destroy = function() {
+      this.eraseBoxAll();
+      this._boxes = {};
     };
     PictureBoxManager.showBox = function(boxId) {
       var box = this.boxes[boxId];
@@ -210,6 +217,10 @@
         break;
       case 'PictureBoxEraseAll':
         PictureBoxCommand.eraseAll(args);
+        break;
+      case 'PictureBoxDestroy':
+        // destroyは_boxesを初期化する（eraseAllはしない）。destroyだけでよい？
+        PictureBoxCommand.destroy(args);
         break;
     }
   };
