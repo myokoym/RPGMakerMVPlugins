@@ -18,6 +18,37 @@
  *
  * @help PictureBox.js
  *
+ * You can handle multiple pictures at once.
+ *   * Overlay partial pictures.
+ *   * Partial replacement.
+ *   * Move multiple pictures with one command.
+ *   * Remove multiple pictures with one command.
+ *   etc.
+ *
+ * Basic Usage
+ *   By Plugin Commands.
+ *
+ *   PictureBox createBox 1 400 100 80
+ *   PictureBox addPicture 1 1 body1
+ *   PictureBox addPicture 1 2 face1
+ *   PictureBox addPicture 1 3 clothes1
+ *   PictureBox showBox 1
+ *   ...
+ *   PictureBox addPicture 1 2 face2
+ *   ...
+ *   PictureBox destroyBox
+ *
+ * Plugin Commands
+ *   (<>: required, []: optional, (): valid range)
+ *   create box:      PictureBox createBox <boxId (1-5)> [x] [y] [scale]
+ *   add picture:     PictureBox addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *   show box:        PictureBox showBox <boxId>
+ *   move box:        PictureBox moveBox <boxId> <x> <y> [scale] [duration]
+ *   remove picture:  PictureBox removePicture <boxId> <zOrder>
+ *   hide box:        PictureBox hideBox <boxId>
+ *   destroy box:     PictureBox destroyBox <boxId>
+ *   destroy all box: PictureBox destroyBoxAll
+ *
  * This plugin is released under the MIT License.
  */
 /*:ja
