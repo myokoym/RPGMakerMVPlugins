@@ -64,7 +64,7 @@
  *     例: PictureBox_removePicture 1 1
  *     説明: 指定した画像をBoxと画面上から消去します。
  *
- *   [未実装] Box非表示コマンド
+ *   Box非表示コマンド
  *     PictureBox_hideBox <boxId>
  *     例: PictureBox_hideBox 1
  *     説明: 指定したBoxを一時的に非表示にします。
@@ -125,6 +125,11 @@
       var boxId = args[0]; //1-5
       var zOrder = args[1]; //1-20
       PictureBoxManager.removePicture(boxId, zOrder);
+    };
+    PictureBoxCommand.hideBox = function(args) {
+      console.log(args);
+      var boxId = args[0];
+      PictureBoxManager.hideBox(boxId);
     };
     PictureBoxCommand.destroyBox = function(args) {
       var boxId = args[0];
@@ -225,6 +230,17 @@
       $gameScreen.erasePicture(box.pictureIdBase + zOrder);
       delete box.parts[zOrder];
     };
+    PictureBoxManager.hideBox = function(boxId) {
+      var box = this.boxes[boxId];
+      box.hide = true;
+      for (var part of box.parts) {
+        if (!part) {
+          continue;
+        }
+        var pictureId = box.pictureIdBase + part.zOrder;
+        $gameScreen.picture(pictureId)._opacity = 0;
+      }
+    };
     PictureBoxManager.destroyBox = function(boxId) {
       var box = this.boxes[boxId];
       box.parts.forEach(function(p) {
@@ -269,6 +285,9 @@
         break;
       case 'PICTUREBOX_REMOVEPICTURE':
         PictureBoxCommand.removePicture(args);
+        break;
+      case 'PICTUREBOX_HIDEBOX':
+        PictureBoxCommand.hideBox(args);
         break;
       case 'PICTUREBOX_DESTROYBOX':
         PictureBoxCommand.destroyBox(args);
