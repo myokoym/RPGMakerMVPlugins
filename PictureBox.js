@@ -6,6 +6,7 @@
  http://opensource.org/licenses/mit-license.php
 ----------------------------------------------------------------------------
  Version
+ 0.2.0 2020/10/19 x, y, scaleのデフォルト値をプラグインパラメータ化
  0.1.0 2020/10/18 試作版リリース
  ----------------------------------------------------------------------------
  Support: https://twitter.com/myokoym
@@ -15,6 +16,21 @@
 /*:
  * @plugindesc PictureBox
  * @author myokoym
+ *
+ * @param defaultX
+ * @text default x
+ * @default 400
+ * @type number
+ *
+ * @param defaultY
+ * @text default y
+ * @default 0
+ * @type number
+ *
+ * @param defaultScale
+ * @text default scale
+ * @default 100
+ * @type number
  *
  * @help PictureBox.js
  *
@@ -54,6 +70,24 @@
 /*:ja
  * @plugindesc 画像ボックス
  * @author myokoym
+ *
+ * @param defaultX
+ * @text デフォルトx座標
+ * @desc Boxのデフォルトx座標です。createBox呼び出し時にxが省略された場合はこの値が使われます。
+ * @default 400
+ * @type number
+ *
+ * @param defaultY
+ * @text デフォルトy座標
+ * @desc Boxのデフォルトy座標です。createBox呼び出し時にyが省略された場合はこの値が使われます。
+ * @default 0
+ * @type number
+ *
+ * @param defaultScale
+ * @text デフォルト拡大率
+ * @desc Boxのデフォルト拡大率です。createBox呼び出し時にscaleが省略された場合はこの値が使われます。
+ * @default 100
+ * @type number
  *
  * @help PictureBox.js
  *
@@ -145,11 +179,20 @@
 var PictureBoxCommand = (function() {
     function PictureBoxCommand() {
     }
+    PictureBoxCommand.getDefaultX = function() {
+      return Number(PluginManager.parameters("PictureBox")["defaultX"]);
+    };
+    PictureBoxCommand.getDefaultY = function() {
+      return Number(PluginManager.parameters("PictureBox")["defaultY"]);
+    };
+    PictureBoxCommand.getDefaultScale = function() {
+      return Number(PluginManager.parameters("PictureBox")["defaultScale"]);
+    };
     PictureBoxCommand.createBox = function(args) {
         var boxId = args[0]; //1-5
-        var x = args[1] || 470;
-        var y = args[2] || 0;
-        var scale = args[3] || 100;
+        var x = args[1] || this.getDefaultX();
+        var y = args[2] || this.getDefaultY();
+        var scale = args[3] || this.getDefaultScale();
         var pictureIdBase = (boxId - 1) * 20 + 1;
         PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
     };
