@@ -36,7 +36,7 @@
  *   ...
  *   PictureBox addPicture 1 2 face2
  *   ...
- *   PictureBox destroyBox
+ *   PictureBox destroyBoxAll
  *
  * Plugin Commands
  *   (<>: required, []: optional, (): valid range)
@@ -71,7 +71,7 @@
  *   ...
  *   PictureBox addPicture 1 2 表情2
  *   ...
- *   PictureBox destroyBox
+ *   PictureBox destroyBoxAll
  *
  * プラグインコマンド一覧（詳細は後述）
  *   Box生成コマンド:     PictureBox createBox <boxId (1-5)> [x] [y] [scale]
