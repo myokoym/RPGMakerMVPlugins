@@ -109,205 +109,206 @@
  */
 
 (function() {
-  'use strict';
+'use strict';
 
-  var PictureBoxCommand = (function() {
+var PictureBoxCommand = (function() {
     function PictureBoxCommand() {
     }
     PictureBoxCommand.createBox = function(args) {
-      var boxId = args[0]; //1-5
-      var x = args[1] || 470;
-      var y = args[2] || 0;
-      var scale = args[3] || 100;
-      var pictureIdBase = (boxId - 1) * 20 + 1;
-      PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
+        var boxId = args[0]; //1-5
+        var x = args[1] || 470;
+        var y = args[2] || 0;
+        var scale = args[3] || 100;
+        var pictureIdBase = (boxId - 1) * 20 + 1;
+        PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
     };
     PictureBoxCommand.addPicture = function(args) {
-      var boxId = args[0]; //1-5
-      var zOrder = args[1]; //1-20
-      var pictureName = args[2];
-      PictureBoxManager.addPicture(boxId, zOrder, pictureName);
+        var boxId = args[0]; //1-5
+        var zOrder = args[1]; //1-20
+        var pictureName = args[2];
+        PictureBoxManager.addPicture(boxId, zOrder, pictureName);
     };
     PictureBoxCommand.showBox = function(args) {
-      var boxId = args[0];
-      PictureBoxManager.showBox(boxId);
+        var boxId = args[0];
+        PictureBoxManager.showBox(boxId);
     };
     PictureBoxCommand.moveBox = function(args) {
-      var boxId = args[0];
-      var x = args[1];
-      var y = args[2];
-      var scale = args[3];
-      var duration = args[4];
-      PictureBoxManager.moveBox(boxId, x, y, scale, duration);
+        var boxId = args[0];
+        var x = args[1];
+        var y = args[2];
+        var scale = args[3];
+        var duration = args[4];
+        PictureBoxManager.moveBox(boxId, x, y, scale, duration);
     };
     PictureBoxCommand.removePicture = function(args) {
-      var boxId = args[0]; //1-5
-      var zOrder = args[1]; //1-20
-      PictureBoxManager.removePicture(boxId, zOrder);
+        var boxId = args[0]; //1-5
+        var zOrder = args[1]; //1-20
+        PictureBoxManager.removePicture(boxId, zOrder);
     };
     PictureBoxCommand.hideBox = function(args) {
-      var boxId = args[0];
-      PictureBoxManager.hideBox(boxId);
+        var boxId = args[0];
+        PictureBoxManager.hideBox(boxId);
     };
     PictureBoxCommand.destroyBox = function(args) {
-      var boxId = args[0];
-      PictureBoxManager.destroyBox(boxId);
+        var boxId = args[0];
+        PictureBoxManager.destroyBox(boxId);
     };
     PictureBoxCommand.destroyBoxAll = function(args) {
-      PictureBoxManager.destroyBoxAll();
+        PictureBoxManager.destroyBoxAll();
     };
     return PictureBoxCommand;
-  }());
+}());
 
-  var PictureBoxManager = (function() {
+var PictureBoxManager = (function() {
     function PictureBoxManager() {
     }
     Object.defineProperty(PictureBoxManager, "boxes", {
-      get: function() {
-        return this._boxes;
-      },
-      enumerable: true,
-      configurable: true
+        get: function() {
+            return this._boxes;
+        },
+        enumerable: true,
+        configurable: true
     });
     PictureBoxManager.createBox = function(boxId, pictureIdBase, x, y, scale) {
-      this.boxes[boxId] = {
-        pictureIdBase: pictureIdBase,
-        x: x,
-        y: y,
-        scale: scale,
-        hide: true,
-        pictures: []
-      };
+        this.boxes[boxId] = {
+            pictureIdBase: pictureIdBase,
+            x: x,
+            y: y,
+            scale: scale,
+            hide: true,
+            pictures: []
+        };
     };
     PictureBoxManager.addPicture = function(boxId, zOrder, name) {
-      var box = this.boxes[boxId];
-      zOrder = Number(zOrder);
-      box.pictures[zOrder] = {
-        zOrder: zOrder,
-        name: name
-      };
-      var opacity = 255;
-      if (box.hide) {
-        opacity = 0;
-      }
-      $gameScreen.showPicture(box.pictureIdBase + zOrder,
-                              name,
-                              0,
-                              box.x, box.y,
-                              box.scale, box.scale,
-                              opacity,
-                              0);
+        var box = this.boxes[boxId];
+        zOrder = Number(zOrder);
+        box.pictures[zOrder] = {
+            zOrder: zOrder,
+            name: name
+        };
+        var opacity = 255;
+        if (box.hide) {
+            opacity = 0;
+        }
+        $gameScreen.showPicture(box.pictureIdBase + zOrder,
+                                name,
+                                0,
+                                box.x, box.y,
+                                box.scale, box.scale,
+                                opacity,
+                                0);
     };
     PictureBoxManager.showBox = function(boxId) {
-      var box = this.boxes[boxId];
-      box.hide = false;
-      for (var picture of box.pictures) {
-        if (!picture) {
-          continue;
+        var box = this.boxes[boxId];
+        box.hide = false;
+        for (var picture of box.pictures) {
+            if (!picture) {
+                continue;
+            }
+            var pictureId = box.pictureIdBase + picture.zOrder;
+            $gameScreen.picture(pictureId)._opacity = 255;
         }
-        var pictureId = box.pictureIdBase + picture.zOrder;
-        $gameScreen.picture(pictureId)._opacity = 255;
-      }
     };
     PictureBoxManager.moveBox = function(boxId, x, y, scale, duration) {
-      var box = this.boxes[boxId];
-      box.x = x;
-      box.y = y;
-      if (scale) {
-        box.scale = scale;
-      }
-      if (!duration) {
-        duration = 1;
-      }
-      setTimeout(function() { // addPictureとmoveを続けて呼ぶと一部画像が消えることがあるバグの暫定対策
-        for (var picture of box.pictures) {
-          if (!picture) {
-            continue;
-          }
-          var pictureId = box.pictureIdBase + picture.zOrder;
-          $gameScreen.movePicture(pictureId,
-                                  0,
-                                  box.x, box.y,
-                                  box.scale, box.scale,
-                                  255,
-                                  0,
-                                  duration);
+        var box = this.boxes[boxId];
+        box.x = x;
+        box.y = y;
+        if (scale) {
+            box.scale = scale;
         }
-      });
+        if (!duration) {
+            duration = 1;
+        }
+        setTimeout(function() { // addPictureとmoveを続けて呼ぶと一部画像が消えることがあるバグの暫定対策
+            for (var picture of box.pictures) {
+                if (!picture) {
+                    continue;
+                }
+                var pictureId = box.pictureIdBase + picture.zOrder;
+                $gameScreen.movePicture(pictureId,
+                                        0,
+                                        box.x, box.y,
+                                        box.scale, box.scale,
+                                        255,
+                                        0,
+                                        duration);
+            }
+        });
     };
     PictureBoxManager.removePicture = function(boxId, zOrder) {
-      var box = this.boxes[boxId];
-      zOrder = Number(zOrder);
-      $gameScreen.erasePicture(box.pictureIdBase + zOrder);
-      delete box.pictures[zOrder];
+        var box = this.boxes[boxId];
+        zOrder = Number(zOrder);
+        $gameScreen.erasePicture(box.pictureIdBase + zOrder);
+        delete box.pictures[zOrder];
     };
     PictureBoxManager.hideBox = function(boxId) {
-      var box = this.boxes[boxId];
-      box.hide = true;
-      for (var picture of box.pictures) {
-        if (!picture) {
-          continue;
+        var box = this.boxes[boxId];
+        box.hide = true;
+        for (var picture of box.pictures) {
+            if (!picture) {
+                continue;
+            }
+            var pictureId = box.pictureIdBase + picture.zOrder;
+            $gameScreen.picture(pictureId)._opacity = 0;
         }
-        var pictureId = box.pictureIdBase + picture.zOrder;
-        $gameScreen.picture(pictureId)._opacity = 0;
-      }
     };
     PictureBoxManager.destroyBox = function(boxId) {
-      var box = this.boxes[boxId];
-      box.pictures.forEach(function(picture) {
-        if (!picture) {
-          return;
-        }
-        $gameScreen.erasePicture(box.pictureIdBase + picture.zOrder);
-      });
-      delete this.boxes[boxId];
+        var box = this.boxes[boxId];
+        box.pictures.forEach(function(picture) {
+            if (!picture) {
+                return;
+            }
+            $gameScreen.erasePicture(box.pictureIdBase + picture.zOrder);
+        });
+        delete this.boxes[boxId];
     };
     PictureBoxManager.destroyBoxAll = function() {
-      for (var boxId of Object.keys(this.boxes)) {
-        this.destroyBox(boxId);
-      }
-      this._boxes = {};
+        for (var boxId of Object.keys(this.boxes)) {
+            this.destroyBox(boxId);
+        }
+        this._boxes = {};
     };
     PictureBoxManager._boxes = {};
     return PictureBoxManager;
-  }());
+}());
 
-  var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-  Game_Interpreter.prototype.pluginCommand = function(command, args) {
+var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
+Game_Interpreter.prototype.pluginCommand = function(command, args) {
     _Game_Interpreter_pluginCommand.apply(this, arguments);
     this.pluginCommandPictureBox(command, args);
-  };
+};
 
-  Game_Interpreter.prototype.pluginCommandPictureBox = function(command, args) {
+Game_Interpreter.prototype.pluginCommandPictureBox = function(command, args) {
     if (command.toUpperCase() !== "PICTUREBOX") {
-      return;
+        return;
     }
     var subCommand = args.shift();
     switch (subCommand.toUpperCase()) {
-      case 'CREATEBOX':
-        PictureBoxCommand.createBox(args);
-        break;
-      case 'ADDPICTURE':
-        PictureBoxCommand.addPicture(args);
-        break;
-      case 'SHOWBOX':
-        PictureBoxCommand.showBox(args);
-        break;
-      case 'MOVEBOX':
-        PictureBoxCommand.moveBox(args);
-        break;
-      case 'REMOVEPICTURE':
-        PictureBoxCommand.removePicture(args);
-        break;
-      case 'HIDEBOX':
-        PictureBoxCommand.hideBox(args);
-        break;
-      case 'DESTROYBOX':
-        PictureBoxCommand.destroyBox(args);
-        break;
-      case 'DESTROYBOXALL':
-        PictureBoxCommand.destroyBoxAll(args);
-        break;
+        case 'CREATEBOX':
+            PictureBoxCommand.createBox(args);
+            break;
+        case 'ADDPICTURE':
+            PictureBoxCommand.addPicture(args);
+            break;
+        case 'SHOWBOX':
+            PictureBoxCommand.showBox(args);
+            break;
+        case 'MOVEBOX':
+            PictureBoxCommand.moveBox(args);
+            break;
+        case 'REMOVEPICTURE':
+            PictureBoxCommand.removePicture(args);
+            break;
+        case 'HIDEBOX':
+            PictureBoxCommand.hideBox(args);
+            break;
+        case 'DESTROYBOX':
+            PictureBoxCommand.destroyBox(args);
+            break;
+        case 'DESTROYBOXALL':
+            PictureBoxCommand.destroyBoxAll(args);
+            break;
     }
-  };
+};
+
 })();
