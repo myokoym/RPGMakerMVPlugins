@@ -6,11 +6,14 @@
  http://opensource.org/licenses/mit-license.php
 ----------------------------------------------------------------------------
  Version
- 0.1.0 2020/10/18 初版
+ 0.1.0 2020/10/18 試作版リリース
+ ----------------------------------------------------------------------------
+ Support: https://twitter.com/myokoym
+ Latest: https://github.com/myokoym/RPGMakerMVPlugins/blob/main/PictureBox.js
 =============================================================================*/
 
 /*:
- * @plugindesc PictureBoxPlugin
+ * @plugindesc PictureBox
  * @author myokoym
  *
  * @help PictureBox.js
@@ -23,16 +26,62 @@
  *
  * @help PictureBox.js
  *
- * プラグインコマンド詳細
- *  イベントコマンド「プラグインコマンド」から実行。
- *  （パラメータの間は半角スペースで区切る）
+ * 複数の画像をまとめて扱えるプラグインです。画像を合成せずに保持するのが特徴で、
+ * 差分を重ねての表示、部分的な差し替え、一括移動、一括消去などが主な機能です。
  *
- * PictureBox HOGE
+ * プラグインコマンド一覧
+ *   引数について: <>は必須、[]は任意、()は有効な値の範囲
  *
- * 利用規約：
- *  作者に無断で改変、再配布が可能で、利用形態（商用、18禁利用等）
- *  についても制限はありません。
- *  このプラグインはもうあなたのものです。
+ *   Box生成コマンド
+ *     PictureBox_createBox <boxId (1-5)> [x] [y] [scale]
+ *     例: PictureBox_createBox 1 400 0 80
+ *     説明: Boxの枠を生成します。
+ *           Boxに設定したx、y、scaleがすべての画像に適用されます。
+ *           Boxは5つまで生成でき、それぞれ20個の画像番号を使用します。
+ *
+ *   Picture追加コマンド
+ *     PictureBox_addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *     例: PictureBox_addPicture 1 1 body1
+ *     説明: 追加された画像はzOrderが小さい画像から順に重ねて表示されます。
+ *           手前に表示したい画像はzOrderを大きくしてください。
+ *           追加された画像はPictureBox_showBoxコマンドを呼ぶまでは非表示です。
+ *
+ *   Box表示コマンド
+ *     PictureBox_showBox <boxId>
+ *     例: PictureBox_showBox 1
+ *     説明: 指定したBoxを表示します。
+ *           このコマンドを呼ぶまではBoxは非表示になっています。
+ *           差分を追加し終わったらこのコマンドで表示させてください。
+ *           一度呼ばれると、それ以降に追加した画像はすぐに表示されるようになります。
+ *
+ *   Box移動コマンド
+ *     PictureBox_moveBox <boxId> <x> <y> [scale] [duration]
+ *     例: PictureBox_moveBox 1 300 100 150
+ *     説明: 指定したBoxを移動、拡大、縮小します。
+ *
+ *   [未実装] Picture削除コマンド
+ *     PictureBox_removePicture <boxId> <zOrder>
+ *     例: PictureBox_removePicture 1 1
+ *     説明: 指定した画像をBoxと画面上から消去します。
+ *
+ *   [未実装] Box非表示コマンド
+ *     PictureBox_hideBox <boxId>
+ *     例: PictureBox_hideBox 1
+ *     説明: 指定したBoxを一時的に非表示にします。
+ *           PictureBox_showBoxコマンドで再度表示できます。
+ *
+ *   Box破棄コマンド
+ *     PictureBox_destroyBox <boxId>
+ *     例: PictureBox_destroyBox 1
+ *     説明: 指定したBoxを削除して画面上からも消去します。
+ *
+ *   全Box破棄コマンド
+ *     PictureBox_destroyBoxAll
+ *     例: PictureBox_destroyBox
+ *     説明: すべてのBoxを削除して画面上からも消去します。
+ *
+ * ライセンス
+ *   MITライセンス
  */
 
 (function() {
@@ -41,28 +90,28 @@
   var PictureBoxCommand = (function() {
     function PictureBoxCommand() {
     }
-    PictureBoxCommand.create = function(args) {
+    PictureBoxCommand.createBox = function(args) {
       console.log(args);
       var boxId = args[0]; //1-5
-      var pictureIdBase = (boxId - 1) * 20 + 1;
-      var x = args[1] || 400;
+      var x = args[1] || 470;
       var y = args[2] || 0;
       var scale = args[3] || 100;
+      var pictureIdBase = (boxId - 1) * 20 + 1;
       PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
     };
-    PictureBoxCommand.putParts = function(args) {
+    PictureBoxCommand.addPicture = function(args) {
       console.log(args);
       var boxId = args[0]; //1-5
       var zOrder = args[1]; //1-20
       var pictureName = args[2];
-      PictureBoxManager.putParts(boxId, zOrder, pictureName);
+      PictureBoxManager.addPicture(boxId, zOrder, pictureName);
     };
-    PictureBoxCommand.show = function(args) {
+    PictureBoxCommand.showBox = function(args) {
       console.log(args);
       var boxId = args[0];
       PictureBoxManager.showBox(boxId);
     };
-    PictureBoxCommand.move = function(args) {
+    PictureBoxCommand.moveBox = function(args) {
       console.log(args);
       var boxId = args[0];
       var x = args[1];
@@ -71,15 +120,12 @@
       var duration = args[4];
       PictureBoxManager.moveBox(boxId, x, y, scale, duration);
     };
-    PictureBoxCommand.erase = function(args) {
+    PictureBoxCommand.destroyBox = function(args) {
       var boxId = args[0];
-      PictureBoxManager.eraseBox(boxId);
+      PictureBoxManager.destroyBox(boxId);
     };
-    PictureBoxCommand.eraseAll = function(args) {
-      PictureBoxManager.eraseBoxAll();
-    };
-    PictureBoxCommand.destroy = function(args) {
-      PictureBoxManager.destroy();
+    PictureBoxCommand.destroyBoxAll = function(args) {
+      PictureBoxManager.destroyBoxAll();
     };
     return PictureBoxCommand;
   }());
@@ -105,7 +151,7 @@
       };
       console.log(PictureBoxManager.boxes);
     };
-    PictureBoxManager.putParts = function(boxId, zOrder, name) {
+    PictureBoxManager.addPicture = function(boxId, zOrder, name) {
       var box = this.boxes[boxId];
       zOrder = Number(zOrder);
       box.parts[zOrder] = {
@@ -127,26 +173,6 @@
                               box.scale, box.scale,
                               opacity,
                               0);
-    };
-    PictureBoxManager.eraseBox = function(boxId) {
-      // TODO: destroy parts
-      var box = this.boxes[boxId];
-      box.parts.forEach(function(p) {
-        console.log(p);
-        if (!p) {
-          return;
-        }
-        $gameScreen.erasePicture(box.pictureIdBase + p.zOrder);
-      });
-    };
-    PictureBoxManager.eraseBoxAll = function() {
-      for (var boxId of Object.keys(this.boxes)) {
-        this.eraseBox(boxId);
-      }
-    };
-    PictureBoxManager.destroy = function() {
-      this.eraseBoxAll();
-      this._boxes = {};
     };
     PictureBoxManager.showBox = function(boxId) {
       var box = this.boxes[boxId];
@@ -187,6 +213,23 @@
         }
       });
     };
+    PictureBoxManager.destroyBox = function(boxId) {
+      var box = this.boxes[boxId];
+      box.parts.forEach(function(p) {
+        console.log(p);
+        if (!p) {
+          return;
+        }
+        $gameScreen.erasePicture(box.pictureIdBase + p.zOrder);
+      });
+      delete this.boxes[boxId];
+    };
+    PictureBoxManager.destroyBoxAll = function() {
+      for (var boxId of Object.keys(this.boxes)) {
+        this.destroyBox(boxId);
+      }
+      this._boxes = {};
+    };
     PictureBoxManager._boxes = {};
     return PictureBoxManager;
   }());
@@ -199,28 +242,27 @@
 
   Game_Interpreter.prototype.pluginCommandPictureBox = function(command, args) {
     console.log(command);
-    switch (command) {
-      case 'PictureBoxCreate':
-        PictureBoxCommand.create(args);
+    switch (command.toUpperCase()) {
+      case 'PICTUREBOX_CREATEBOX':
+        PictureBoxCommand.createBox(args);
         break;
-      case 'PictureBoxPutParts':
-        PictureBoxCommand.putParts(args);
+      case 'PICTUREBOX_ADDPICTURE':
+        PictureBoxCommand.addPicture(args);
         break;
-      case 'PictureBoxShow':
-        PictureBoxCommand.show(args);
+      case 'PICTUREBOX_SHOWBOX':
+        PictureBoxCommand.showBox(args);
         break;
-      case 'PictureBoxMove':
-        PictureBoxCommand.move(args);
+      case 'PICTUREBOX_MOVEBOX':
+        PictureBoxCommand.moveBox(args);
         break;
-      case 'PictureBoxErase':
-        PictureBoxCommand.erase(args);
+      case 'PICTUREBOX_REMOVEPICTURE':
+        PictureBoxCommand.removePicture(args);
         break;
-      case 'PictureBoxEraseAll':
-        PictureBoxCommand.eraseAll(args);
+      case 'PICTUREBOX_DESTROYBOX':
+        PictureBoxCommand.destroyBox(args);
         break;
-      case 'PictureBoxDestroy':
-        // destroyは_boxesを初期化する（eraseAllはしない）。destroyだけでよい？
-        PictureBoxCommand.destroy(args);
+      case 'PICTUREBOX_DESTROYBOXALL':
+        PictureBoxCommand.destroyBoxAll(args);
         break;
     }
   };
