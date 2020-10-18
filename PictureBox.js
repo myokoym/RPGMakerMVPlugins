@@ -32,76 +32,76 @@
  * 基本的な使用例
  *   プラグインコマンドに以下よって操作します。
  *
- *   PictureBox_createBox 1 400 100 80
- *   PictureBox_addPicture 1 1 体1
- *   PictureBox_addPicture 1 2 表情1
- *   PictureBox_addPicture 1 3 服1
- *   PictureBox_showBox 1
+ *   PictureBox createBox 1 400 100 80
+ *   PictureBox addPicture 1 1 体1
+ *   PictureBox addPicture 1 2 表情1
+ *   PictureBox addPicture 1 3 服1
+ *   PictureBox showBox 1
  *   ...
- *   PictureBox_addPicture 1 2 表情2
+ *   PictureBox addPicture 1 2 表情2
  *   ...
- *   PictureBox_destroyBox
+ *   PictureBox destroyBox
  *
  * プラグインコマンド一覧（詳細は後述）
- *   Box生成コマンド:     PictureBox_createBox <boxId (1-5)> [x] [y] [scale]
- *   Picture追加コマンド: PictureBox_addPicture <boxId> <zOrder (1-20)> <pictureName>
- *   Box表示コマンド:     PictureBox_showBox <boxId>
- *   Box移動コマンド:     PictureBox_moveBox <boxId> <x> <y> [scale] [duration]
- *   Picture削除コマンド: PictureBox_removePicture <boxId> <zOrder>
- *   Box非表示コマンド:   PictureBox_hideBox <boxId>
- *   Box破棄コマンド:     PictureBox_destroyBox <boxId>
- *   全Box破棄コマンド:   PictureBox_destroyBoxAll
+ *   Box生成コマンド:     PictureBox createBox <boxId (1-5)> [x] [y] [scale]
+ *   Picture追加コマンド: PictureBox addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *   Box表示コマンド:     PictureBox showBox <boxId>
+ *   Box移動コマンド:     PictureBox moveBox <boxId> <x> <y> [scale] [duration]
+ *   Picture削除コマンド: PictureBox removePicture <boxId> <zOrder>
+ *   Box非表示コマンド:   PictureBox hideBox <boxId>
+ *   Box破棄コマンド:     PictureBox destroyBox <boxId>
+ *   全Box破棄コマンド:   PictureBox destroyBoxAll
  *
  * プラグインコマンド詳細
  *   引数について: <>は必須、[]は任意、()は有効な値の範囲
  *
  *   Box生成コマンド
- *     PictureBox_createBox <boxId (1-5)> [x] [y] [scale]
- *     例: PictureBox_createBox 1 400 0 80
+ *     PictureBox createBox <boxId (1-5)> [x] [y] [scale]
+ *     例: PictureBox createBox 1 400 0 80
  *     説明: Boxの枠を生成します。
  *           Boxに設定したx、y、scaleがすべての画像に適用されます。
  *           Boxは5つまで生成でき、それぞれ20個の画像番号を使用します。
  *
  *   Picture追加コマンド
- *     PictureBox_addPicture <boxId> <zOrder (1-20)> <pictureName>
- *     例: PictureBox_addPicture 1 1 body1
+ *     PictureBox addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *     例: PictureBox addPicture 1 1 body1
  *     説明: pictureNameはimg/picturesフォルダ内のファイル名（拡張子除く）を指定します。
  *           追加された画像はzOrderが小さい画像から順に重ねて表示されます。
  *           手前に表示したい画像はzOrderを大きくしてください。
- *           追加された画像はPictureBox_showBoxコマンドを呼ぶまでは非表示です。
+ *           追加された画像はPictureBox showBoxコマンドを呼ぶまでは非表示です。
  *
  *   Box表示コマンド
- *     PictureBox_showBox <boxId>
- *     例: PictureBox_showBox 1
+ *     PictureBox showBox <boxId>
+ *     例: PictureBox showBox 1
  *     説明: 指定したBoxを表示します。
  *           このコマンドを呼ぶまではBoxは非表示になっています。
  *           差分を追加し終わったらこのコマンドで表示させてください。
  *           一度呼ばれると、それ以降に追加した画像はすぐに表示されるようになります。
  *
  *   Box移動コマンド
- *     PictureBox_moveBox <boxId> <x> <y> [scale] [duration]
- *     例: PictureBox_moveBox 1 300 100 150
+ *     PictureBox moveBox <boxId> <x> <y> [scale] [duration]
+ *     例: PictureBox moveBox 1 300 100 150
  *     説明: 指定したBoxを移動、拡大、縮小します。
  *
  *   Picture削除コマンド
- *     PictureBox_removePicture <boxId> <zOrder>
- *     例: PictureBox_removePicture 1 1
+ *     PictureBox removePicture <boxId> <zOrder>
+ *     例: PictureBox removePicture 1 1
  *     説明: 指定した画像をBoxと画面上から消去します。
  *
  *   Box非表示コマンド
- *     PictureBox_hideBox <boxId>
- *     例: PictureBox_hideBox 1
+ *     PictureBox hideBox <boxId>
+ *     例: PictureBox hideBox 1
  *     説明: 指定したBoxを一時的に非表示にします。
- *           PictureBox_showBoxコマンドで再度表示できます。
+ *           PictureBox showBoxコマンドで再度表示できます。
  *
  *   Box破棄コマンド
- *     PictureBox_destroyBox <boxId>
- *     例: PictureBox_destroyBox 1
+ *     PictureBox destroyBox <boxId>
+ *     例: PictureBox destroyBox 1
  *     説明: 指定したBoxを削除して画面上からも消去します。
  *
  *   全Box破棄コマンド
- *     PictureBox_destroyBoxAll
- *     例: PictureBox_destroyBox
+ *     PictureBox destroyBoxAll
+ *     例: PictureBox destroyBox
  *     説明: すべてのBoxを削除して画面上からも消去します。
  *
  * ライセンス
@@ -279,29 +279,33 @@
   };
 
   Game_Interpreter.prototype.pluginCommandPictureBox = function(command, args) {
-    switch (command.toUpperCase()) {
-      case 'PICTUREBOX_CREATEBOX':
+    if (command.toUpperCase() !== "PICTUREBOX") {
+      return;
+    }
+    var subCommand = args.shift();
+    switch (subCommand.toUpperCase()) {
+      case 'CREATEBOX':
         PictureBoxCommand.createBox(args);
         break;
-      case 'PICTUREBOX_ADDPICTURE':
+      case 'ADDPICTURE':
         PictureBoxCommand.addPicture(args);
         break;
-      case 'PICTUREBOX_SHOWBOX':
+      case 'SHOWBOX':
         PictureBoxCommand.showBox(args);
         break;
-      case 'PICTUREBOX_MOVEBOX':
+      case 'MOVEBOX':
         PictureBoxCommand.moveBox(args);
         break;
-      case 'PICTUREBOX_REMOVEPICTURE':
+      case 'REMOVEPICTURE':
         PictureBoxCommand.removePicture(args);
         break;
-      case 'PICTUREBOX_HIDEBOX':
+      case 'HIDEBOX':
         PictureBoxCommand.hideBox(args);
         break;
-      case 'PICTUREBOX_DESTROYBOX':
+      case 'DESTROYBOX':
         PictureBoxCommand.destroyBox(args);
         break;
-      case 'PICTUREBOX_DESTROYBOXALL':
+      case 'DESTROYBOXALL':
         PictureBoxCommand.destroyBoxAll(args);
         break;
     }
