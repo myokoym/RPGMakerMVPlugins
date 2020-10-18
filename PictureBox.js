@@ -59,7 +59,7 @@
  *     例: PictureBox_moveBox 1 300 100 150
  *     説明: 指定したBoxを移動、拡大、縮小します。
  *
- *   [未実装] Picture削除コマンド
+ *   Picture削除コマンド
  *     PictureBox_removePicture <boxId> <zOrder>
  *     例: PictureBox_removePicture 1 1
  *     説明: 指定した画像をBoxと画面上から消去します。
@@ -119,6 +119,12 @@
       var scale = args[3];
       var duration = args[4];
       PictureBoxManager.moveBox(boxId, x, y, scale, duration);
+    };
+    PictureBoxCommand.removePicture = function(args) {
+      console.log(args);
+      var boxId = args[0]; //1-5
+      var zOrder = args[1]; //1-20
+      PictureBoxManager.removePicture(boxId, zOrder);
     };
     PictureBoxCommand.destroyBox = function(args) {
       var boxId = args[0];
@@ -212,6 +218,12 @@
                                   duration);
         }
       });
+    };
+    PictureBoxManager.removePicture = function(boxId, zOrder) {
+      var box = this.boxes[boxId];
+      zOrder = Number(zOrder);
+      $gameScreen.erasePicture(box.pictureIdBase + zOrder);
+      delete box.parts[zOrder];
     };
     PictureBoxManager.destroyBox = function(boxId) {
       var box = this.boxes[boxId];
