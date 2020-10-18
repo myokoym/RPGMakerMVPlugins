@@ -91,7 +91,6 @@
     function PictureBoxCommand() {
     }
     PictureBoxCommand.createBox = function(args) {
-      console.log(args);
       var boxId = args[0]; //1-5
       var x = args[1] || 470;
       var y = args[2] || 0;
@@ -100,19 +99,16 @@
       PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
     };
     PictureBoxCommand.addPicture = function(args) {
-      console.log(args);
       var boxId = args[0]; //1-5
       var zOrder = args[1]; //1-20
       var pictureName = args[2];
       PictureBoxManager.addPicture(boxId, zOrder, pictureName);
     };
     PictureBoxCommand.showBox = function(args) {
-      console.log(args);
       var boxId = args[0];
       PictureBoxManager.showBox(boxId);
     };
     PictureBoxCommand.moveBox = function(args) {
-      console.log(args);
       var boxId = args[0];
       var x = args[1];
       var y = args[2];
@@ -121,13 +117,11 @@
       PictureBoxManager.moveBox(boxId, x, y, scale, duration);
     };
     PictureBoxCommand.removePicture = function(args) {
-      console.log(args);
       var boxId = args[0]; //1-5
       var zOrder = args[1]; //1-20
       PictureBoxManager.removePicture(boxId, zOrder);
     };
     PictureBoxCommand.hideBox = function(args) {
-      console.log(args);
       var boxId = args[0];
       PictureBoxManager.hideBox(boxId);
     };
@@ -160,7 +154,6 @@
         hide: true,
         pictures: []
       };
-      console.log(PictureBoxManager.boxes);
     };
     PictureBoxManager.addPicture = function(boxId, zOrder, name) {
       var box = this.boxes[boxId];
@@ -173,10 +166,6 @@
       if (box.hide) {
         opacity = 0;
       }
-      console.log(box.pictureIdBase);
-      console.log(zOrder);
-      console.log("pictureId: ");
-      console.log(box.pictureIdBase + zOrder);
       $gameScreen.showPicture(box.pictureIdBase + zOrder,
                               name,
                               0,
@@ -201,7 +190,6 @@
       box.x = x;
       box.y = y;
       if (scale) {
-        console.log(scale);
         box.scale = scale;
       }
       if (!duration) {
@@ -213,7 +201,6 @@
             continue;
           }
           var pictureId = box.pictureIdBase + picture.zOrder;
-          console.log(pictureId);
           $gameScreen.movePicture(pictureId,
                                   0,
                                   box.x, box.y,
@@ -244,7 +231,6 @@
     PictureBoxManager.destroyBox = function(boxId) {
       var box = this.boxes[boxId];
       box.pictures.forEach(function(picture) {
-        console.log(picture);
         if (!picture) {
           return;
         }
@@ -269,7 +255,6 @@
   };
 
   Game_Interpreter.prototype.pluginCommandPictureBox = function(command, args) {
-    console.log(command);
     switch (command.toUpperCase()) {
       case 'PICTUREBOX_CREATEBOX':
         PictureBoxCommand.createBox(args);
