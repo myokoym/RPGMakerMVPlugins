@@ -6,6 +6,7 @@
  http://opensource.org/licenses/mit-license.php
 ----------------------------------------------------------------------------
  Version
+ 0.2.1 2020/10/19 引数チェックを追加
  0.2.0 2020/10/19 x, y, scaleのデフォルト値をプラグインパラメータ化
  0.1.0 2020/10/18 試作版リリース
  ----------------------------------------------------------------------------
@@ -193,6 +194,9 @@ var PictureBoxCommand = (function() {
     };
     PictureBoxCommand.createBox = function(args) {
         var boxId = args[0]; //1-5
+        if (boxId < 1 || boxId > 5) {
+          throw new RangeError("引数boxIdの範囲が不正です。プラグインコマンドを確認してください: PictureBox " + args.join(" "));
+        }
         var x = args[1] || this.getPluginParameter("defaultX");
         var y = args[2] || this.getPluginParameter("defaultY");
         var scale = args[3] || this.getPluginParameter("defaultScale");
@@ -201,7 +205,13 @@ var PictureBoxCommand = (function() {
     };
     PictureBoxCommand.addPicture = function(args) {
         var boxId = args[0]; //1-5
+        if (!PictureBoxManager.boxes[boxId]) {
+          throw new Error("引数boxIdのBoxが存在しません。先にcreateBoxコマンドを呼んでください: PictureBox " + args.join(" "));
+        }
         var zOrder = args[1]; //1-20
+        if (zOrder < 1 || zOrder > 20) {
+          throw new RangeError("引数zOrderの範囲が不正です。プラグインコマンドを確認してください: PictureBox " + args.join(" "));
+        }
         var pictureName = args[2];
         PictureBoxManager.addPicture(boxId, zOrder, pictureName);
     };
