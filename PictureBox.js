@@ -196,7 +196,7 @@ var PictureBoxCommand = (function() {
         var x = args[1] || this.getPluginParameter("defaultX");
         var y = args[2] || this.getPluginParameter("defaultY");
         var scale = args[3] || this.getPluginParameter("defaultScale");
-        var pictureIdBase = (boxId - 1) * 20 + 1;
+        var pictureIdBase = (boxId - 1) * 20;
         PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
     };
     PictureBoxCommand.addPicture = function(args) {
