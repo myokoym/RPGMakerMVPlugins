@@ -95,7 +95,7 @@
  * 差分を重ねての表示、部分的な差し替え、一括移動、一括消去などが主な機能です。
  *
  * 基本的な使用例
- *   プラグインコマンドによって操作します。
+ *   プラグインコマンドに以下よって操作します。
  *
  *   PictureBox createBox 1 400 100 80
  *   PictureBox addPicture 1 1 体1
@@ -179,20 +179,23 @@
 var PictureBoxCommand = (function() {
     function PictureBoxCommand() {
     }
-    PictureBoxCommand.getDefaultX = function() {
-      return Number(PluginManager.parameters("PictureBox")["defaultX"]);
-    };
-    PictureBoxCommand.getDefaultY = function() {
-      return Number(PluginManager.parameters("PictureBox")["defaultY"]);
-    };
-    PictureBoxCommand.getDefaultScale = function() {
-      return Number(PluginManager.parameters("PictureBox")["defaultScale"]);
+    PictureBoxCommand._pluginParametersCache = {};
+    PictureBoxCommand.getPluginParameter = function(name) {
+        if (typeof this._pluginParametersCache[name] !== "undefined") {
+            return this._pluginParametersCache[name];
+        }
+        var param = PluginManager.parameters("PictureBox")[name];
+        if (!isNaN(param)) {
+            param = Number(param);
+        }
+        this._pluginParametersCache[name] = param;
+        return param;
     };
     PictureBoxCommand.createBox = function(args) {
         var boxId = args[0]; //1-5
-        var x = args[1] || this.getDefaultX();
-        var y = args[2] || this.getDefaultY();
-        var scale = args[3] || this.getDefaultScale();
+        var x = args[1] || this.getPluginParameter("defaultX");
+        var y = args[2] || this.getPluginParameter("defaultY");
+        var scale = args[3] || this.getPluginParameter("defaultScale");
         var pictureIdBase = (boxId - 1) * 20 + 1;
         PictureBoxManager.createBox(boxId, pictureIdBase, x, y, scale);
     };
