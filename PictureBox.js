@@ -361,11 +361,7 @@ var PictureBoxManager = (function() {
 
 var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
 Game_Interpreter.prototype.pluginCommand = function(command, args) {
-    _Game_Interpreter_pluginCommand.apply(this, arguments);
-    this.pluginCommandPictureBox(command, args);
-};
-
-Game_Interpreter.prototype.pluginCommandPictureBox = function(command, args) {
+    _Game_Interpreter_pluginCommand.call(this, command, args);
     if (command.toUpperCase() !== "PICTUREBOX") {
         return;
     }
