@@ -76,6 +76,19 @@
 var PLUGIN_NAMECommand = (function() {
     function PLUGIN_NAMECommand() {
     }
+    PLUGIN_NAMECommand.getPluginParameter = function(name) {
+        if (typeof this._pluginParametersCache[name] !== "undefined") {
+            return this._pluginParametersCache[name];
+        }
+        var param = PluginManager.parameters("PLUGIN_NAME")[name];
+        if (param === "true" || param === "false") {
+            param = Boolean(param);
+        } else if (!isNaN(param)) {
+            param = Number(param);
+        }
+        this._pluginParametersCache[name] = param;
+        return param;
+    };
     PLUGIN_NAMECommand.getDefault = function() {
       return Number(PluginManager.parameters("PLUGIN_NAME")["default"]);
     };
