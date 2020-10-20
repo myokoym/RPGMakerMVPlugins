@@ -118,11 +118,7 @@ var PLUGIN_NAMEManager = (function() {
 
 var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
 Game_Interpreter.prototype.pluginCommand = function(command, args) {
-    _Game_Interpreter_pluginCommand.apply(this, arguments);
-    this.pluginCommandPLUGIN_NAME(command, args);
-};
-
-Game_Interpreter.prototype.pluginCommandPLUGIN_NAME = function(command, args) {
+    _Game_Interpreter_pluginCommand.call(this, command, args);
     if (command.toUpperCase() !== "PLUGIN_NAME") {
         return;
     }
