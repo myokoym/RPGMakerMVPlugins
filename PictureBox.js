@@ -6,7 +6,8 @@
  http://opensource.org/licenses/mit-license.php
 ----------------------------------------------------------------------------
  Version
- 0.3.0 2020/10/28 showBox時に手前の画像が遅れて表示されるバグの暫定対応
+ 0.3.0 2020/10/28 showBox時に手前の画像が遅れて表示されるバグの修正
+ 0.2.2 2020/10/22 addPicturesコマンドを暫定追加（使いにくいので廃止予定）
  0.2.1 2020/10/19 引数チェックを追加
  0.2.0 2020/10/19 x, y, scaleのデフォルト値をプラグインパラメータ化
  0.1.0 2020/10/18 試作版リリース
@@ -263,7 +264,8 @@ var PictureBoxManager = (function() {
             x: x,
             y: y,
             scale: scale,
-            hide: true,
+            hidden: true,
+            shownEvenOnce: false,
             pictures: []
         };
     };
@@ -275,29 +277,48 @@ var PictureBoxManager = (function() {
             name: name
         };
         var opacity = 255;
-        if (box.hide) {
+        if (box.hidden) {
             opacity = 0;
         }
-        $gameScreen.showPicture(box.pictureIdBase + zOrder,
-                                name,
-                                0,
-                                box.x, box.y,
-                                box.scale, box.scale,
-                                opacity,
-                                0);
+        if (box.shownEvenOnce) {
+            $gameScreen.showPicture(box.pictureIdBase + zOrder,
+                                    name,
+                                    0,
+                                    box.x, box.y,
+                                    box.scale, box.scale,
+                                    opacity,
+                                    0);
+        } else {
+            ImageManager.loadPicture(name);
+        }
     };
     PictureBoxManager.showBox = function(boxId) {
         var box = this.boxes[boxId];
-        box.hide = false;
-        setTimeout(function() { // 手前の画像が遅れて表示されるバグの暫定対策
+        var imageLoadingInterval = setInterval(function() {
+            if (!ImageManager.isReady()) {
+                return;
+            }
             for (var picture of box.pictures) {
                 if (!picture) {
                     continue;
                 }
                 var pictureId = box.pictureIdBase + picture.zOrder;
-                $gameScreen.picture(pictureId)._opacity = 255;
+                if (box.shownEvenOnce) {
+                    $gameScreen.picture(pictureId)._opacity = 255;
+                } else {
+                    $gameScreen.showPicture(pictureId,
+                                            picture.name,
+                                            0,
+                                            box.x, box.y,
+                                            box.scale, box.scale,
+                                            255,
+                                            0);
+                }
             }
-        });
+            box.hidden = false;
+            box.shownEvenOnce = true;
+            clearInterval(imageLoadingInterval);
+        }, 50);
     };
     PictureBoxManager.moveBox = function(boxId, x, y, scale, duration) {
         var box = this.boxes[boxId];
@@ -333,7 +354,7 @@ var PictureBoxManager = (function() {
     };
     PictureBoxManager.hideBox = function(boxId) {
         var box = this.boxes[boxId];
-        box.hide = true;
+        box.hidden = true;
         for (var picture of box.pictures) {
             if (!picture) {
                 continue;
