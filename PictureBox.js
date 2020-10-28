@@ -6,6 +6,7 @@
  http://opensource.org/licenses/mit-license.php
 ----------------------------------------------------------------------------
  Version
+ 0.3.0 2020/10/28 showBox時に手前の画像が遅れて表示されるバグの暫定対応
  0.2.1 2020/10/19 引数チェックを追加
  0.2.0 2020/10/19 x, y, scaleのデフォルト値をプラグインパラメータ化
  0.1.0 2020/10/18 試作版リリース
@@ -288,13 +289,15 @@ var PictureBoxManager = (function() {
     PictureBoxManager.showBox = function(boxId) {
         var box = this.boxes[boxId];
         box.hide = false;
-        for (var picture of box.pictures) {
-            if (!picture) {
-                continue;
+        setTimeout(function() { // 手前の画像が遅れて表示されるバグの暫定対策
+            for (var picture of box.pictures) {
+                if (!picture) {
+                    continue;
+                }
+                var pictureId = box.pictureIdBase + picture.zOrder;
+                $gameScreen.picture(pictureId)._opacity = 255;
             }
-            var pictureId = box.pictureIdBase + picture.zOrder;
-            $gameScreen.picture(pictureId)._opacity = 255;
-        }
+        });
     };
     PictureBoxManager.moveBox = function(boxId, x, y, scale, duration) {
         var box = this.boxes[boxId];
