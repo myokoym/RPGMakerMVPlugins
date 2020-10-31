@@ -6,8 +6,8 @@
  http://opensource.org/licenses/mit-license.php
 ----------------------------------------------------------------------------
  Version
+ 0.4.0 2020/10/31 loadPicturesコマンド追加
  0.3.0 2020/10/28 showBox時に手前の画像が遅れて表示されるバグの修正
- 0.2.2 2020/10/22 addPicturesコマンドを暫定追加（使いにくいので廃止予定）
  0.2.1 2020/10/19 引数チェックを追加
  0.2.0 2020/10/19 x, y, scaleのデフォルト値をプラグインパラメータ化
  0.1.0 2020/10/18 試作版リリース
@@ -58,9 +58,10 @@
  *   PictureBox destroyBoxAll
  *
  * Plugin Commands
- *   (<>: required, []: optional, (): valid range)
+ *   (<>: required, []: optional, ...: multiple, (): valid range)
  *   create box:      PictureBox createBox <boxId (1-5)> [x] [y] [scale]
  *   add picture:     PictureBox addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *   load pictures:   PictureBox loadPictures <pictureName>...
  *   show box:        PictureBox showBox <boxId>
  *   move box:        PictureBox moveBox <boxId> <x> <y> [scale] [duration]
  *   remove picture:  PictureBox removePicture <boxId> <zOrder>
@@ -113,6 +114,7 @@
  * プラグインコマンド一覧（詳細は後述）
  *   Box生成コマンド:     PictureBox createBox <boxId (1-5)> [x] [y] [scale]
  *   Picture追加コマンド: PictureBox addPicture <boxId> <zOrder (1-20)> <pictureName>
+ *   Picture読込コマンド: PictureBox loadPictures <pictureName>...
  *   Box表示コマンド:     PictureBox showBox <boxId>
  *   Box移動コマンド:     PictureBox moveBox <boxId> <x> <y> [scale] [duration]
  *   Picture削除コマンド: PictureBox removePicture <boxId> <zOrder>
@@ -121,7 +123,7 @@
  *   全Box破棄コマンド:   PictureBox destroyBoxAll
  *
  * プラグインコマンド詳細
- *   引数について: <>は必須、[]は任意、()は有効な値の範囲
+ *   引数について: <>は必須、[]は任意、...は複数指定可、()は有効な値の範囲
  *
  *   Box生成コマンド
  *     PictureBox createBox <boxId (1-5)> [x] [y] [scale]
@@ -137,6 +139,18 @@
  *           追加された画像はzOrderが小さい画像から順に重ねて表示されます。
  *           手前に表示したい画像はzOrderを大きくしてください。
  *           追加された画像はPictureBox showBoxコマンドを呼ぶまでは非表示です。
+ *
+ *   Picture読込コマンド
+ *     PictureBox loadPictures <pictureName>...
+ *     例: PictureBox loadPictures body2 body3
+ *     説明: pictureNameはimg/picturesフォルダ内のファイル名（拡張子除く）を指定します。
+ *           指定された画像はバックグラウンドで読み込まれ、
+ *           addPicture時に表示までのタイムラグが少なくなります。
+ *           主に、初回showBox後に初めてaddPictureする画像のタイムラグ回避に使用します。
+ *           （初回showBoxより前にaddPictureされた画像は自動的にバックグラウンドで
+ *             読み込まれるため、loadPicturesに指定する必要はありません。）
+ *           （初回showBox時に画像の読み込み待ちをするため、
+ *             初回showBoxより前にloadPicturesを呼ぶと確実にタイムラグを減らせます。
  *
  *   Box表示コマンド
  *     PictureBox showBox <boxId>
@@ -217,6 +231,9 @@ var PictureBoxCommand = (function() {
         var pictureName = args[2];
         PictureBoxManager.addPicture(boxId, zOrder, pictureName);
     };
+    PictureBoxCommand.loadPictures = function(args) {
+        PictureBoxManager.loadPictures(args);
+    },
     PictureBoxCommand.showBox = function(args) {
         var boxId = args[0];
         PictureBoxManager.showBox(boxId);
@@ -258,6 +275,15 @@ var PictureBoxManager = (function() {
         enumerable: true,
         configurable: true
     });
+    var runAfterImagesLoaded = function(func) {
+        var imagesLoadingInterval = setInterval(function() {
+            if (!ImageManager.isReady()) {
+                return;
+            }
+            func();
+            clearInterval(imagesLoadingInterval);
+        }, 50);
+    };
     PictureBoxManager.createBox = function(boxId, pictureIdBase, x, y, scale) {
         this.boxes[boxId] = {
             pictureIdBase: pictureIdBase,
@@ -292,12 +318,14 @@ var PictureBoxManager = (function() {
             ImageManager.loadPicture(name);
         }
     };
+    PictureBoxManager.loadPictures = function(names) {
+        for (var i = 0; i < names.length; i++) {
+            ImageManager.loadPicture(names[i]);
+        }
+    };
     PictureBoxManager.showBox = function(boxId) {
-        var box = this.boxes[boxId];
-        var imageLoadingInterval = setInterval(function() {
-            if (!ImageManager.isReady()) {
-                return;
-            }
+        runAfterImagesLoaded(function() {
+            var box = PictureBoxManager.boxes[boxId];
             for (var picture of box.pictures) {
                 if (!picture) {
                     continue;
@@ -317,8 +345,7 @@ var PictureBoxManager = (function() {
             }
             box.hidden = false;
             box.shownEvenOnce = true;
-            clearInterval(imageLoadingInterval);
-        }, 50);
+        });
     };
     PictureBoxManager.moveBox = function(boxId, x, y, scale, duration) {
         var box = this.boxes[boxId];
@@ -396,6 +423,9 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
             break;
         case 'ADDPICTURE':
             PictureBoxCommand.addPicture(args);
+            break;
+        case 'LOADPICTURES':
+            PictureBoxCommand.loadPictures(args);
             break;
         case 'SHOWBOX':
             PictureBoxCommand.showBox(args);
