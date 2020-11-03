@@ -32,9 +32,10 @@
 
 var _Window_ChoiceList_processCancel = Window_ChoiceList.prototype.processCancel;
 Window_ChoiceList.prototype.processCancel = function() {
-    if (!TouchInput.isCancelled()) {
-        _Window_ChoiceList_processCancel.call(this)
+    if (TouchInput.isCancelled()) {
+        return;
     }
+    _Window_ChoiceList_processCancel.call(this)
 };
 
 })();
