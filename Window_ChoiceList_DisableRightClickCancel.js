@@ -35,7 +35,7 @@ Window_ChoiceList.prototype.processCancel = function() {
     if (TouchInput.isCancelled()) {
         return;
     }
-    _Window_ChoiceList_processCancel.call(this)
+    _Window_ChoiceList_processCancel.call(this);
 };
 
 })();
