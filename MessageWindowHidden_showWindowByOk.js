@@ -1,9 +1,8 @@
 /*=============================================================================
  MessageWindowHidden_showWindowByOk.js
 ----------------------------------------------------------------------------
- (C) 2020 Masafumi Yokoyama <myokoym@gmail.com>
- This software is released under the MIT License.
- http://opensource.org/licenses/mit-license.php
+ CC0 1.0 Universal (Public Domain)
+ https://creativecommons.org/publicdomain/zero/1.0/deed.ja
 ----------------------------------------------------------------------------
  Version
  0.1.0 2020/11/07 試作版リリース
