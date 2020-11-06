@@ -8,7 +8,7 @@
  Version
  0.1.0 2020/11/07 試作版リリース
  ----------------------------------------------------------------------------
- Latest: https://github.com/myokoym/RPGMakerMVPlugins/blob/main/MessageWindowHidden_showWindowByOk .js
+ Latest: https://github.com/myokoym/RPGMakerMVPlugins/blob/main/MessageWindowHidden_showWindowByOk.js
 =============================================================================*/
 
 /*:
