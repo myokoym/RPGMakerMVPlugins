@@ -15,3 +15,8 @@ RPGツクールMV用プラグイン集
 
 選択肢で右クリックによるキャンセルを無効化するプラグインです。
 Escキーによるキャンセルを残しつつ、右クリックによるキャンセルは無効化したい場合に有用です。
+
+## [MessageWindowHidden_showWindowByOk](https://github.com/myokoym/RPGMakerMVPlugins/blob/main/MessageWindowHidden_showWindowByOk.js)
+
+メッセージウィンドウ一時消去プラグイン（MessageWindowHidden.js）を拡張し、
+okキー（enter、space、Z）や左クリックでもウィンドウを再表示するように変更するプラグインです。
